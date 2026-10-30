@@ -12,7 +12,26 @@ export const Rulesets: import('../../../sim/dex-formats').ModdedFormatDataTable 
 			'Standard AG',
 			'Sleep Moves Clause', 'Nickname Clause', 'OHKO Clause', 'Evasion Clause',
 		],
-	},
+		onAnyFaint(target, source, effect) {
+			if (this.activeMove?.id === 'steelbeam') {
+				const state = this.effectState;
+				if (!state.steelBeamFaints) state.steelBeamFaints = [];
+				state.steelBeamFaints.push(target);
+			}
+		},
+		onAfterMove(pokemon, target, move) {
+			const state = this.effectState;
+			if (move.id === 'steelbeam' && state.steelBeamFaints && state.steelBeamFaints.length > 1) {
+				const [p1Fainted, p2Fainted] = state.steelBeamFaints;
+				
+				// slower mon faints first. if faster one faints then change the > to a <
+				if (p1Fainted.speed !== p2Fainted.speed) {
+					const winner = p1Fainted.speed > p2Fainted.speed ? p1Fainted.side : p2Fainted.side;
+					this.win(winner);
+				}
+				state.steelBeamFaints = null;
+			}
+		},	},
 	standarddoubles: {
 		inherit: true,
 		ruleset: [
