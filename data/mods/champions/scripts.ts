@@ -543,14 +543,13 @@ export const Scripts: ModdedBattleScriptsData = {
 			// hit is 1 higher than the actual hit count
 			if (hit === 1) return damage.fill(false);
 			if (nullDamage) damage.fill(false);
+			if (move.totalDamage) {
+				this.applyRecoilDamage(move.totalDamage, move, pokemon);
+			}
 			this.battle.faintMessages(false, false, !pokemon.hp);
 			if (move.multihit && typeof move.smartTarget !== 'boolean' &&
 				!(move.hit === 1 && move.multihitType === 'parentalbond')) {
 				this.battle.add('-hitcount', targets[0], hit - 1);
-			}
-
-			if (move.totalDamage) {
-				this.applyRecoilDamage(move.totalDamage, move, pokemon);
 			}
 
 			// smartTarget messes up targetsCopy, but smartTarget should in theory ensure that targets will never fail, anyway
